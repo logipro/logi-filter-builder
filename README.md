@@ -35,7 +35,7 @@ getFilterStatement: function which will be called when user clicks on Apply butt
 
 ## example
 
-you can find an example in /demo/src/index.js
+you can find an example https://logipro.github.io/logi-filter-builder/
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
 [build]: https://travis-ci.org/logipro/logi-filter-builder
