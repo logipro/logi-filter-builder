@@ -35,7 +35,7 @@
   "author": "LogiPro UK",
   "homepage": "LogiPro.co.uk",
   "license": "MIT",
-  "repository": "https://github.com/logipro/logi-advanced-filter.git",
+  "repository": "https://github.com/logipro/logi-filter-builder",
   "keywords": [
     "react-component",
     "material-ui",
