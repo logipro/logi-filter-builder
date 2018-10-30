@@ -33,9 +33,9 @@ an Array of {Header: "headerName", accessor: "DatabaseFieldName", dataType: "Str
 
 getFilterStatement: function which will be called when user clicks on Apply button and if validation is successful it will return the Tsql filter statement. (Note: currently this has only been tested with MS SQL Server).
 
-## example
+## demo
 
-you can find an example https://logipro.github.io/logi-filter-builder/
+you can find demo on https://logipro.github.io/logi-filter-builder/
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
 [build]: https://travis-ci.org/logipro/logi-filter-builder
