@@ -57,6 +57,13 @@ operatorTypes
     { Label: ">", TranslateTo: " > " },
     { Label: ">=", TranslateTo: " >= " }
   ])
+  .set("Date", [
+    { Label: "<", TranslateTo: " < " },
+    { Label: "<=", TranslateTo: " <= " },
+    { Label: "=", TranslateTo: " = " },
+    { Label: ">", TranslateTo: " > " },
+    { Label: ">=", TranslateTo: " >= " }
+  ])
   .set("String", [
     { Label: "Like", TranslateTo: " Like " },
     { Label: "Not Like", TranslateTo: " Not Like " },
@@ -349,9 +356,45 @@ function ValueInput(props) {
   var { classes, conditionColumn, conditionColumnIndex, handleChange } = props;
 
   switch (props.dataType) {
-    case "DateTime":
     case "Date":
-    case "Time":
+      return (
+        <FormControl className={classes.formControl}>
+          <TextField
+            id="standard-dense"
+            type={"date"}
+            className={classes.textField}
+            error={!(conditionColumn.value && conditionColumn.value.value)}
+            value={
+              conditionColumn.value && conditionColumn.value.value
+                ? conditionColumn.value.value
+                : null
+            }
+            onChange={e => {
+              var d = new Date(Date.parse(e.target.value));
+              var dateString =
+                `'` +
+                d.getFullYear() +
+                "-" +
+                ("0" + (d.getMonth() + 1)).slice(-2) +
+                "-" +
+                ("0" + d.getDate()).slice(-2) +
+                " " +
+                ("0" + d.getHours()).slice(-2) +
+                ":" +
+                ("0" + d.getMinutes()).slice(-2) +
+                `'`;
+              handleChange(
+                conditionColumn,
+                conditionColumnIndex,
+                e.target.value,
+                "value",
+                dateString
+              );
+            }}
+          />
+        </FormControl>
+      );
+    case "DateTime":
     case "DateTime2":
       return (
         <FormControl className={classes.formControl}>

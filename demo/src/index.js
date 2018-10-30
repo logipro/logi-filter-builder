@@ -6,19 +6,24 @@ import AdvancedFilter from "../../src";
 class Demo extends Component {
   render() {
     const columns = [
-      { Header: "Task", accessor: "Task", dataType: "String" },
+      { Header: "String Column", accessor: "Task", dataType: "String" },
       {
-        Header: "CreatedDateTime",
+        Header: "DateTime Column",
         accessor: "CreatedDateTime",
         dataType: "DateTime"
       },
       {
-        Header: "TaskBeginTime",
+        Header: "Date Column",
         accessor: "TaskBeginTime",
-        dataType: "DateTime"
+        dataType: "Date"
       },
       { Header: "TaskEndTime", accessor: "TaskEndTime", dataType: "DateTime" },
-      { Header: "TaskID", accessor: "TaskID", show: true, dataType: "Number" },
+      {
+        Header: "Number Column",
+        accessor: "TaskID",
+        show: true,
+        dataType: "Number"
+      },
       //{ Header: "TaskTypeID", accessor: "TaskTypeID" }
       //{ Header: "Flag", accessor: "Flag" },
       //{ Header: "JobName", accessor: "JobName" },
