@@ -1,0 +1,46 @@
+{
+  "name": "logi-filter-builder",
+  "version": "1.0.0",
+  "description": "Logi-filter-builder React component",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "files": [
+    "css",
+    "es",
+    "lib",
+    "umd"
+  ],
+  "scripts": {
+    "build": "nwb build-react-component",
+    "clean": "nwb clean-module && nwb clean-demo",
+    "prepublishOnly": "npm run build",
+    "start": "nwb serve-react-demo",
+    "test": "nwb test-react",
+    "test:coverage": "nwb test-react --coverage",
+    "test:watch": "nwb test-react --server"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "react": "16.x",
+    "@material-ui/core": "3.3.x",
+    "@material-ui/icons": "3.x"
+  },
+  "devDependencies": {
+    "@material-ui/core": "3.3.x",
+    "@material-ui/icons": "3.x",
+    "nwb": "0.23.x",
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0"
+  },
+  "author": "LogiPro UK",
+  "homepage": "LogiPro.co.uk",
+  "license": "MIT",
+  "repository": "https://github.com/logipro/logi-advanced-filter.git",
+  "keywords": [
+    "react-component",
+    "material-ui",
+    "data-grid",
+    "Filter",
+    "T SQL"
+  ]
+}
