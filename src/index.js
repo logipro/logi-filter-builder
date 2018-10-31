@@ -1,26 +1,30 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import {
-  withStyles,
-  Button,
-  Divider,
-  ExpansionPanelActions
-} from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import Divider from "@material-ui/core/Divider";
+import ExpansionPanel from "@material-ui/core/ExpansionPanel";
+import ExpansionPanelActions from "@material-ui/core/ExpansionPanelActions";
+import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
-import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import withStyles from "@material-ui/core/styles/withStyles";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { operatorTypes, operandTypes } from "./Settings";
+import PropTypes from "prop-types";
+import React, { Component } from "react";
 import ConditionLine from "./ConditionLine";
+import { operandTypes, operatorTypes } from "./Settings";
 
 const styles = theme => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
     flexDirection: "column"
+  },
+  conditionSection: {
+    display: "flex",
+    flexWrap: "wrap",
+    flexDirection: "row",
+    alignItems: "center"
   },
   button: {
     //margin: theme.spacing.unit / 2
@@ -208,17 +212,19 @@ class AdvancedFilter extends Component {
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Typography className={classes.heading}>
             {this.state.Error
-              ? this.state.Error
+              ? "Please fix errors"
               : this.state.filterStatement
                 ? this.state.filterStatement
-                : "Create Filter"}
+                : this.props.header
+                  ? this.props.header
+                  : "Create Filter"}
           </Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <div className={classes.root}>
             {this.state.conditions.map((condition, index) => {
               return (
-                <section key={index}>
+                <section key={index} className={classes.conditionSection}>
                   {condition.type === "Simple" ? (
                     <React.Fragment>
                       <ConditionLine
@@ -277,6 +283,8 @@ class AdvancedFilter extends Component {
                           ].conditions = newInnerConditions;
                           this.validateAndCreate(this.state.conditions);
                         }}
+                        isNested={true}
+                        header={"Nested Condition"}
                       />
                       {index + 1 < this.state.conditions.length ? (
                         <FormControl className={classes.formControl}>
@@ -351,15 +359,18 @@ class AdvancedFilter extends Component {
           >
             {"+"}
           </Button>
-          <Button
-            onClick={() =>
-              this.props.getFilterStatement(this.state.filterStatement)
-            }
-            size="small"
-            color="primary"
-          >
-            Apply
-          </Button>
+          {!this.props.isNested && (
+            <Button
+              variant={"outlined"}
+              onClick={() =>
+                this.props.getFilterStatement(this.state.filterStatement)
+              }
+              size="small"
+              color="primary"
+            >
+              Apply
+            </Button>
+          )}
         </ExpansionPanelActions>
       </ExpansionPanel>
     );
@@ -367,7 +378,13 @@ class AdvancedFilter extends Component {
 }
 
 AdvancedFilter.propTypes = {
-  columns: PropTypes.array.isRequired
+  columns: PropTypes.array.isRequired,
+  header: PropTypes.string,
+  getFilterStatement: PropTypes.func
+};
+
+AdvancedFilter.defaultProps = {
+  columns: [{ Header: "Sample", accessor: "sample", dataType: "String" }]
 };
 
 export default withStyles(styles, { withTheme: true })(AdvancedFilter);
