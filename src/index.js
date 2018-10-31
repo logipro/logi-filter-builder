@@ -17,6 +17,8 @@ import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import RemoveIcon from "@material-ui/icons/Remove";
 import ValueInput from "./ValueInput";
+import { operatorTypes, operandTypes } from "./Settings";
+import ConditionLine from "./ConditionLine";
 
 const styles = theme => ({
   root: {
@@ -41,52 +43,21 @@ const styles = theme => ({
   }
 });
 
-const operatorTypes = new Map();
-operatorTypes
-  .set("Number", [
-    { Label: "<", TranslateTo: " < " },
-    { Label: "<=", TranslateTo: " <= " },
-    { Label: "=", TranslateTo: " = " },
-    { Label: ">", TranslateTo: " > " },
-    { Label: ">=", TranslateTo: " >= " }
-  ])
-  .set("DateTime", [
-    { Label: "<", TranslateTo: " < " },
-    { Label: "<=", TranslateTo: " <= " },
-    { Label: "=", TranslateTo: " = " },
-    { Label: ">", TranslateTo: " > " },
-    { Label: ">=", TranslateTo: " >= " }
-  ])
-  .set("Date", [
-    { Label: "<", TranslateTo: " < " },
-    { Label: "<=", TranslateTo: " <= " },
-    { Label: "=", TranslateTo: " = " },
-    { Label: ">", TranslateTo: " > " },
-    { Label: ">=", TranslateTo: " >= " }
-  ])
-  .set("String", [
-    { Label: "Like", TranslateTo: " Like " },
-    { Label: "Not Like", TranslateTo: " Not Like " },
-    { Label: "=", TranslateTo: " = " },
-    { Label: "!=", TranslateTo: " != " }
-  ]);
-
-const operandTypes = new Map();
-operandTypes
-  .set("AND", { Label: "AND", TranslateTo: " AND " })
-  .set("OR", { Label: "OR", TranslateTo: " OR " });
-
 class AdvancedFilter extends Component {
-  state = {
-    currentConditions: [
-      {
-        column: undefined,
-        operator: undefined,
-        value: undefined,
-        operand: operandTypes.get("AND")
-      }
-    ]
-  };
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.state = {
+      currentConditions: [
+        {
+          column: undefined,
+          operator: undefined,
+          value: undefined,
+          operand: operandTypes.get("AND")
+        }
+      ]
+    };
+  }
 
   addNewCondition() {
     let currentConditions = [...this.state.currentConditions];
@@ -201,97 +172,31 @@ class AdvancedFilter extends Component {
           </Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
-          <form className={classes.root} autoComplete="off">
-            {this.state.currentConditions.map((cc, index) => (
+          <div className={classes.root}>
+            {this.state.currentConditions.map((condition, index) => (
               <section key={index}>
-                <FormControl className={classes.formControl}>
-                  <Select
-                    error={!(cc.column && cc.column.Header)}
-                    native
-                    value={
-                      cc.column && cc.column.Header ? cc.column.Header : "None"
-                    }
-                    onChange={e =>
-                      this.handleChange(cc, index, e.target.value, "column")
-                    }
-                    inputProps={{
-                      name: "column",
-                      id: "column-select"
-                    }}
-                  >
-                    <option value="None" key={"empty"}>
-                      None
-                    </option>
-                    {columns
-                      .filter(c => c.show === undefined || c.show === true)
-                      .map(c => (
-                        <option value={c.Header} key={c.accessor}>
-                          {c.Header}
-                        </option>
-                      ))}
-                  </Select>
-                </FormControl>
-                {cc.column ? (
-                  <FormControl className={classes.formControl}>
-                    <Select
-                      error={!(cc.operator && cc.operator.Label)}
-                      value={
-                        cc.operator && cc.operator.Label
-                          ? cc.operator.Label
-                          : "None"
-                      }
-                      onChange={e =>
-                        this.handleChange(cc, index, e.target.value, "operator")
-                      }
-                      inputProps={{
-                        name: "operator",
-                        id: "operator-select"
-                      }}
-                      native
-                    >
-                      <option value={"None"}>None</option>
-                      {cc.column && cc.column.dataType
-                        ? operatorTypes.get(cc.column.dataType).map(opt => (
-                            <option value={opt.Label} key={opt.Label}>
-                              {opt.Label}
-                            </option>
-                          ))
-                        : null}
-                    </Select>
-                  </FormControl>
-                ) : null}
-                {cc.operator && cc.column.dataType ? (
-                  <ValueInput
-                    classes={classes}
-                    conditionColumn={cc}
-                    conditionColumnIndex={index}
-                    dataType={cc.column.dataType}
-                    handleChange={(
-                      selectedColumn,
-                      index,
-                      value,
-                      changeType,
-                      translateValue
-                    ) =>
-                      this.handleChange(
-                        selectedColumn,
-                        index,
-                        value,
-                        changeType,
-                        translateValue
-                      )
-                    }
-                  />
-                ) : null}
-                {cc.operator &&
+                <ConditionLine
+                  key={index}
+                  classes={classes}
+                  condition={condition}
+                  index={index}
+                  handleChange={this.handleChange}
+                  columns={columns}
+                />
+                {condition.operator &&
                 index + 1 < this.state.currentConditions.length ? (
                   <FormControl className={classes.formControl}>
                     <Select
                       value={
-                        cc.operand.Label //default must be AND
+                        condition.operand.Label //default must be AND
                       }
                       onChange={e =>
-                        this.handleChange(cc, index, e.target.value, "operand")
+                        this.handleChange(
+                          condition,
+                          index,
+                          e.target.value,
+                          "operand"
+                        )
                       }
                       inputProps={{
                         name: "operand",
@@ -320,7 +225,7 @@ class AdvancedFilter extends Component {
                 </IconButton>
               </section>
             ))}
-          </form>
+          </div>
         </ExpansionPanelDetails>
         <IconButton
           aria-label="Add"
