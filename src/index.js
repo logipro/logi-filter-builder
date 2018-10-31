@@ -13,7 +13,6 @@ import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import RemoveIcon from "@material-ui/icons/Remove";
 import { operatorTypes, operandTypes } from "./Settings";
 import ConditionLine from "./ConditionLine";
 
@@ -44,17 +43,23 @@ class AdvancedFilter extends Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
-    this.state = {
-      conditions: [
-        {
-          type: "Simple",
-          column: undefined,
-          operator: undefined,
-          value: undefined,
-          operand: operandTypes.get("AND")
-        }
-      ]
-    };
+    if (props.preLoadConditions) {
+      this.state = {
+        conditions: props.preLoadConditions
+      };
+    } else {
+      this.state = {
+        conditions: [
+          {
+            type: "Simple",
+            column: undefined,
+            operator: undefined,
+            value: undefined,
+            operand: operandTypes.get("AND")
+          }
+        ]
+      };
+    }
   }
 
   addNewCondition() {
@@ -64,6 +69,25 @@ class AdvancedFilter extends Component {
       column: undefined,
       operator: undefined,
       value: undefined,
+      operand: operandTypes.get("AND")
+    });
+    this.validateAndCreate(conditions);
+  }
+
+  addNewNestedCondition() {
+    let conditions = [...this.state.conditions];
+    // @ts-ignore
+    conditions.push({
+      type: "Nested",
+      conditions: [
+        {
+          type: "Simple",
+          column: undefined,
+          operator: undefined,
+          value: undefined,
+          operand: operandTypes.get("AND")
+        }
+      ],
       operand: operandTypes.get("AND")
     });
     this.validateAndCreate(conditions);
@@ -123,45 +147,57 @@ class AdvancedFilter extends Component {
     this.validateAndCreate(conditions);
   }
 
-  validateAndCreate(conditions) {
-    //validate
-    if (
-      conditions.filter(
-        c =>
-          !(
-            c.column &&
+  validate(conditions) {
+    var isValid = true;
+    var filter = "";
+    var index = 0;
+    conditions.forEach(c => {
+      if (c.type === "Simple") {
+        isValid =
+          isValid &&
+          (c.column &&
             c.column.accessor &&
             c.operator &&
             c.operator.TranslateTo &&
             c.value &&
             c.value.translateValue &&
-            c.value.value !== ""
-          )
-      ).length > 0
-    ) {
-      this.setState({
-        Error: "Please fix errors highlighted red and try again",
-        conditions,
-        filterStatement: undefined
-      });
-      return;
-    }
-    //create filter
-    var filter = conditions
-      .map((condition, index) => {
-        return `${condition.column.accessor} ${
-          condition.operator.TranslateTo
-        } ${condition.value.translateValue} ${
-          index + 1 < conditions.length ? condition.operand.TranslateTo : ""
-        }`;
-      })
-      .join(" ");
-    //---
+            c.value.value !== "");
+        if (isValid) {
+          filter =
+            filter +
+            `${c.column.accessor} ${c.operator.TranslateTo} ${
+              c.value.translateValue
+            } ${index + 1 < conditions.length ? c.operand.TranslateTo : ""}`;
+        }
+      } else {
+        var returnedObj = this.validate(c.conditions);
+        isValid = isValid && returnedObj.isValid;
+        filter =
+          filter +
+          ` (  ${returnedObj.filter} )  ${
+            index + 1 < conditions.length ? c.operand.TranslateTo : ""
+          }`;
+      }
+      index++;
+    });
+    return { isValid, filter };
+  }
+
+  validateAndCreate(conditions) {
+    //validate
+    var { isValid, filter } = this.validate(conditions);
+    //console.log(isValid);
+
     this.setState({
-      Error: undefined,
+      Error: !isValid, //"Please fix errors highlighted red and try again",
       conditions,
       filterStatement: filter
     });
+
+    //in case of nested changes this will update the parent conditions
+    if (this.props.onChange) {
+      this.props.onChange(conditions);
+    }
   }
 
   render() {
@@ -181,61 +217,115 @@ class AdvancedFilter extends Component {
         <ExpansionPanelDetails>
           <div className={classes.root}>
             {this.state.conditions.map((condition, index) => {
-              if (condition.type === "Simple") {
-                return (
-                  <section key={index}>
-                    <ConditionLine
-                      key={index}
-                      classes={classes}
-                      condition={condition}
-                      index={index}
-                      handleChange={this.handleChange}
-                      columns={columns}
-                    />
-                    {condition.operator &&
-                    index + 1 < this.state.conditions.length ? (
-                      <FormControl className={classes.formControl}>
-                        <Select
-                          value={
-                            condition.operand.Label //default must be AND
-                          }
-                          onChange={e =>
-                            this.handleChange(
-                              condition,
-                              index,
-                              e.target.value,
-                              "operand"
-                            )
-                          }
-                          inputProps={{
-                            name: "operand",
-                            id: "operand-select"
-                          }}
-                          native
-                        >
-                          {Array.from(operandTypes.values()).map(operand => {
-                            return (
-                              <option value={operand.Label} key={operand.Label}>
-                                {operand.Label}
-                              </option>
-                            );
-                          })}
-                        </Select>
-                      </FormControl>
-                    ) : null}
-                    <Button
-                      variant={"outlined"}
-                      aria-label="Remove"
-                      className={classes.button}
-                      onClick={() => {
-                        this.removeCondition(index);
-                      }}
-                    >
-                      {"-"}
-                    </Button>
-                  </section>
-                );
-              }
+              return (
+                <section key={index}>
+                  {condition.type === "Simple" ? (
+                    <React.Fragment>
+                      <ConditionLine
+                        key={index}
+                        classes={classes}
+                        condition={condition}
+                        index={index}
+                        handleChange={this.handleChange}
+                        columns={columns}
+                      />
+                      {condition.operator &&
+                      index + 1 < this.state.conditions.length ? (
+                        <FormControl className={classes.formControl}>
+                          <Select
+                            value={
+                              condition.operand.Label //default must be AND
+                            }
+                            onChange={e =>
+                              this.handleChange(
+                                condition,
+                                index,
+                                e.target.value,
+                                "operand"
+                              )
+                            }
+                            inputProps={{
+                              name: "operand",
+                              id: "operand-select"
+                            }}
+                            native
+                          >
+                            {Array.from(operandTypes.values()).map(operand => {
+                              return (
+                                <option
+                                  value={operand.Label}
+                                  key={operand.Label}
+                                >
+                                  {operand.Label}
+                                </option>
+                              );
+                            })}
+                          </Select>
+                        </FormControl>
+                      ) : null}
+                    </React.Fragment>
+                  ) : (
+                    <React.Fragment>
+                      <AdvancedFilter
+                        columns={columns}
+                        classes={classes}
+                        preLoadConditions={condition.conditions}
+                        onChange={newInnerConditions => {
+                          //on purpose doing it like this to avoid re render (?!)
+                          this.state.conditions[
+                            index
+                          ].conditions = newInnerConditions;
+                          this.validateAndCreate(this.state.conditions);
+                        }}
+                      />
+                      {index + 1 < this.state.conditions.length ? (
+                        <FormControl className={classes.formControl}>
+                          <Select
+                            value={
+                              condition.operand.Label //default must be AND
+                            }
+                            onChange={e =>
+                              this.handleChange(
+                                condition,
+                                index,
+                                e.target.value,
+                                "operand"
+                              )
+                            }
+                            inputProps={{
+                              name: "operand",
+                              id: "operand-select"
+                            }}
+                            native
+                          >
+                            {Array.from(operandTypes.values()).map(operand => {
+                              return (
+                                <option
+                                  value={operand.Label}
+                                  key={operand.Label}
+                                >
+                                  {operand.Label}
+                                </option>
+                              );
+                            })}
+                          </Select>
+                        </FormControl>
+                      ) : null}
+                    </React.Fragment>
+                  )}
+
+                  <Button
+                    variant={"outlined"}
+                    aria-label="Remove"
+                    className={classes.button}
+                    onClick={() => {
+                      this.removeCondition(index);
+                    }}
+                  >
+                    {"-"}
+                  </Button>
+                </section>
+              );
             })}
           </div>
         </ExpansionPanelDetails>
@@ -246,7 +336,7 @@ class AdvancedFilter extends Component {
             aria-label="AddNested"
             className={classes.button}
             onClick={() => {
-              this.addNewCondition();
+              this.addNewNestedCondition();
             }}
           >
             {"+()"}
