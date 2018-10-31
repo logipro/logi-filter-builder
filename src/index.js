@@ -3,11 +3,9 @@ import PropTypes from "prop-types";
 import {
   withStyles,
   Button,
-  IconButton,
   Divider,
   ExpansionPanelActions
 } from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
@@ -16,7 +14,6 @@ import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import RemoveIcon from "@material-ui/icons/Remove";
-import ValueInput from "./ValueInput";
 import { operatorTypes, operandTypes } from "./Settings";
 import ConditionLine from "./ConditionLine";
 
@@ -48,8 +45,9 @@ class AdvancedFilter extends Component {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.state = {
-      currentConditions: [
+      conditions: [
         {
+          type: "Simple",
           column: undefined,
           operator: undefined,
           value: undefined,
@@ -60,33 +58,33 @@ class AdvancedFilter extends Component {
   }
 
   addNewCondition() {
-    let currentConditions = [...this.state.currentConditions];
-    currentConditions.push({
+    let conditions = [...this.state.conditions];
+    conditions.push({
+      type: "Simple",
       column: undefined,
       operator: undefined,
       value: undefined,
       operand: operandTypes.get("AND")
     });
-    this.setState({ currentConditions });
+    this.validateAndCreate(conditions);
   }
 
   removeCondition(conditionIndex) {
-    let currentConditions = [...this.state.currentConditions];
-    currentConditions.splice(conditionIndex, 1);
-    if (currentConditions.length > 0) {
-      this.setState({ currentConditions });
+    let conditions = [...this.state.conditions];
+    conditions.splice(conditionIndex, 1);
+    if (conditions.length > 0) {
+      this.validateAndCreate(conditions);
     } //case user remove the last condition => we'll add one empty condition
     else {
-      this.setState({
-        currentConditions: [
-          {
-            column: undefined,
-            operator: undefined,
-            value: undefined,
-            operand: operandTypes.get("AND")
-          }
-        ]
-      });
+      this.validateAndCreate([
+        {
+          type: "Simple",
+          column: undefined,
+          operator: undefined,
+          value: undefined,
+          operand: operandTypes.get("AND")
+        }
+      ]);
     }
   }
 
@@ -97,38 +95,38 @@ class AdvancedFilter extends Component {
     changeType,
     translateValue = null
   ) {
-    let currentConditions = [...this.state.currentConditions];
-    let currentCondition;
+    let conditions = [...this.state.conditions];
+    let condition;
     if (changeType === "column")
-      currentCondition = {
+      condition = {
         ...selectedColumn,
         column: this.props.columns.filter(c => c.Header === value)[0]
       };
     else if (changeType === "operator")
-      currentCondition = {
+      condition = {
         ...selectedColumn,
         operator: operatorTypes
           .get(selectedColumn.column.dataType)
           .filter(opt => opt.Label === value)[0]
       };
     else if (changeType === "value")
-      currentCondition = {
+      condition = {
         ...selectedColumn,
         value: { value: value, translateValue: translateValue }
       };
     else if (changeType === "operand")
-      currentCondition = {
+      condition = {
         ...selectedColumn,
         operand: operandTypes.get(value)
       };
-    currentConditions[index] = currentCondition;
-    this.setState({ currentConditions });
+    conditions[index] = condition;
+    this.validateAndCreate(conditions);
   }
 
-  validateAndCreate() {
+  validateAndCreate(conditions) {
     //validate
     if (
-      this.state.currentConditions.filter(
+      conditions.filter(
         c =>
           !(
             c.column &&
@@ -136,29 +134,34 @@ class AdvancedFilter extends Component {
             c.operator &&
             c.operator.TranslateTo &&
             c.value &&
-            c.value.translateValue
+            c.value.translateValue &&
+            c.value.value !== ""
           )
       ).length > 0
     ) {
       this.setState({
-        Error: "Please fix errors highlighted red and try again"
+        Error: "Please fix errors highlighted red and try again",
+        conditions,
+        filterStatement: undefined
       });
       return;
     }
     //create filter
-    this.setState({ Error: undefined });
-    var filter = this.state.currentConditions
+    var filter = conditions
       .map((condition, index) => {
         return `${condition.column.accessor} ${
           condition.operator.TranslateTo
         } ${condition.value.translateValue} ${
-          index + 1 < this.state.currentConditions.length
-            ? condition.operand.TranslateTo
-            : ""
+          index + 1 < conditions.length ? condition.operand.TranslateTo : ""
         }`;
       })
       .join(" ");
-    this.props.getFilterStatement(filter);
+    //---
+    this.setState({
+      Error: undefined,
+      conditions,
+      filterStatement: filter
+    });
   }
 
   render() {
@@ -168,78 +171,100 @@ class AdvancedFilter extends Component {
       <ExpansionPanel>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Typography className={classes.heading}>
-            {this.state.Error ? this.state.Error : "Create Filter"}
+            {this.state.Error
+              ? this.state.Error
+              : this.state.filterStatement
+                ? this.state.filterStatement
+                : "Create Filter"}
           </Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <div className={classes.root}>
-            {this.state.currentConditions.map((condition, index) => (
-              <section key={index}>
-                <ConditionLine
-                  key={index}
-                  classes={classes}
-                  condition={condition}
-                  index={index}
-                  handleChange={this.handleChange}
-                  columns={columns}
-                />
-                {condition.operator &&
-                index + 1 < this.state.currentConditions.length ? (
-                  <FormControl className={classes.formControl}>
-                    <Select
-                      value={
-                        condition.operand.Label //default must be AND
-                      }
-                      onChange={e =>
-                        this.handleChange(
-                          condition,
-                          index,
-                          e.target.value,
-                          "operand"
-                        )
-                      }
-                      inputProps={{
-                        name: "operand",
-                        id: "operand-select"
+            {this.state.conditions.map((condition, index) => {
+              if (condition.type === "Simple") {
+                return (
+                  <section key={index}>
+                    <ConditionLine
+                      key={index}
+                      classes={classes}
+                      condition={condition}
+                      index={index}
+                      handleChange={this.handleChange}
+                      columns={columns}
+                    />
+                    {condition.operator &&
+                    index + 1 < this.state.conditions.length ? (
+                      <FormControl className={classes.formControl}>
+                        <Select
+                          value={
+                            condition.operand.Label //default must be AND
+                          }
+                          onChange={e =>
+                            this.handleChange(
+                              condition,
+                              index,
+                              e.target.value,
+                              "operand"
+                            )
+                          }
+                          inputProps={{
+                            name: "operand",
+                            id: "operand-select"
+                          }}
+                          native
+                        >
+                          {Array.from(operandTypes.values()).map(operand => {
+                            return (
+                              <option value={operand.Label} key={operand.Label}>
+                                {operand.Label}
+                              </option>
+                            );
+                          })}
+                        </Select>
+                      </FormControl>
+                    ) : null}
+                    <Button
+                      variant={"outlined"}
+                      aria-label="Remove"
+                      className={classes.button}
+                      onClick={() => {
+                        this.removeCondition(index);
                       }}
-                      native
                     >
-                      {Array.from(operandTypes.values()).map(operand => {
-                        return (
-                          <option value={operand.Label} key={operand.Label}>
-                            {operand.Label}
-                          </option>
-                        );
-                      })}
-                    </Select>
-                  </FormControl>
-                ) : null}
-                <IconButton
-                  aria-label="Remove"
-                  className={classes.button}
-                  onClick={() => {
-                    this.removeCondition(index);
-                  }}
-                >
-                  <RemoveIcon fontSize={"small"} />
-                </IconButton>
-              </section>
-            ))}
+                      {"-"}
+                    </Button>
+                  </section>
+                );
+              }
+            })}
           </div>
         </ExpansionPanelDetails>
-        <IconButton
-          aria-label="Add"
-          className={classes.button}
-          onClick={() => {
-            this.addNewCondition();
-          }}
-        >
-          <AddIcon fontSize={"small"} />
-        </IconButton>
         <Divider />
         <ExpansionPanelActions>
           <Button
-            onClick={() => this.validateAndCreate()}
+            variant={"outlined"}
+            aria-label="AddNested"
+            className={classes.button}
+            onClick={() => {
+              this.addNewCondition();
+            }}
+          >
+            {"+()"}
+          </Button>
+          <Button
+            variant={"outlined"}
+            aria-label="Add"
+            className={classes.button}
+            onClick={() => {
+              this.addNewCondition();
+            }}
+          >
+            {"+"}
+          </Button>
+          <Button
+            onClick={() =>
+              this.props.getFilterStatement(this.state.filterStatement)
+            }
             size="small"
             color="primary"
           >
