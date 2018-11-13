@@ -1,0 +1,23 @@
+---
+name: Logi Filetr Builder
+route: /
+order: 1
+---
+
+import { Playground, PropsTable } from "docz";
+import AdvancedFilter from "../src/index";
+import Demo from "../demo/src/Demo";
+
+# Logi Filter Builder
+
+A Filter builder which allows your user to create any type of filters and will return the created where clause
+
+<Playground>
+  <React.StrictMode>
+    <Demo />
+  </React.StrictMode>
+</Playground>
+
+# Properties
+
+<PropsTable of={AdvancedFilter} />

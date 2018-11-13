@@ -213,7 +213,7 @@ class AdvancedFilter extends Component {
 
     return (
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <ExpansionPanel>
+        <ExpansionPanel defaultExpanded={this.props.startExpanded}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
             <Typography className={classes.heading}>
               {this.state.Error
@@ -408,11 +408,16 @@ AdvancedFilter.propTypes = {
   /** Text instead of "Create Filter" being used for nested filters internally */
   header: PropTypes.string,
   /** Clicking on Apply will call this function and return the created filter (Where clause) */
-  getFilterStatement: PropTypes.func
+  getFilterStatement: PropTypes.func,
+  /** Send true if you want the expansion panel to be open */
+  startExpanded: PropTypes.bool
 };
 
 AdvancedFilter.defaultProps = {
-  columns: [{ header: "Sample", accessor: "sample", dataType: "String" }]
+  startExpanded: false
 };
 
-export default withStyles(styles, { withTheme: true })(AdvancedFilter);
+//exporting like this so Docz will pick the props!
+export default (AdvancedFilter = withStyles(styles, { withTheme: true })(
+  AdvancedFilter
+));

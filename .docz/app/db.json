@@ -1,0 +1,42 @@
+{
+  "config": {
+    "title": "Logi Filter Builder",
+    "description": "Logi-filter-builder React component",
+    "themeConfig": {
+      "mode": "dark"
+    },
+    "menu": [],
+    "ordering": "descending",
+    "version": "1.0.3",
+    "repository": "https://github.com/logipro/logi-filter-builder",
+    "native": false,
+    "codeSandbox": true,
+    "dest": "./docs",
+    "hashRouter": true,
+    "base": "."
+  },
+  "entries": {
+    "docz/AdvancedFilter.mdx": {
+      "name": "Logi Filetr Builder",
+      "route": "/",
+      "order": 1,
+      "id": "52a256e2ebd935dbbe0c84cf9e7b1b2a",
+      "filepath": "docz/AdvancedFilter.mdx",
+      "link": "https://github.com/logipro/logi-filter-builder/edit/master/docz/AdvancedFilter.mdx",
+      "slug": "docz-advanced-filter",
+      "menu": null,
+      "headings": [
+        {
+          "depth": 1,
+          "slug": "logi-filter-builder",
+          "value": "Logi Filter Builder"
+        },
+        {
+          "depth": 1,
+          "slug": "properties",
+          "value": "Properties"
+        }
+      ]
+    }
+  }
+}
