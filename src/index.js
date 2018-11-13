@@ -13,6 +13,8 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import ConditionLine from "./ConditionLine";
 import { operandTypes, operatorTypes } from "./Settings";
+import { MuiPickersUtilsProvider } from "material-ui-pickers";
+import DateFnsUtils from "@date-io/date-fns";
 
 const styles = theme => ({
   root: {
@@ -128,7 +130,7 @@ class AdvancedFilter extends Component {
     if (changeType === "column")
       condition = {
         ...selectedColumn,
-        column: this.props.columns.filter(c => c.Header === value)[0]
+        column: this.props.columns.filter(c => c.header === value)[0]
       };
     else if (changeType === "operator")
       condition = {
@@ -164,8 +166,10 @@ class AdvancedFilter extends Component {
             c.operator &&
             c.operator.TranslateTo &&
             c.value &&
-            c.value.translateValue &&
+            c.value.translateValue !== undefined &&
+            c.value.value !== undefined &&
             c.value.value !== "");
+
         if (isValid) {
           filter =
             filter +
@@ -208,183 +212,207 @@ class AdvancedFilter extends Component {
     var { classes, columns } = this.props;
 
     return (
-      <ExpansionPanel>
-        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography className={classes.heading}>
-            {this.state.Error
-              ? "Please fix errors"
-              : this.state.filterStatement
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <ExpansionPanel>
+          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography className={classes.heading}>
+              {this.state.Error
+                ? "Please fix errors"
+                : this.state.filterStatement
                 ? this.state.filterStatement
                 : this.props.header
-                  ? this.props.header
-                  : "Create Filter"}
-          </Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <div className={classes.root}>
-            {this.state.conditions.map((condition, index) => {
-              return (
-                <section key={index} className={classes.conditionSection}>
-                  {condition.type === "Simple" ? (
-                    <React.Fragment>
-                      <ConditionLine
-                        key={index}
-                        classes={classes}
-                        condition={condition}
-                        index={index}
-                        handleChange={this.handleChange}
-                        columns={columns}
-                      />
-                      {condition.operator &&
-                      index + 1 < this.state.conditions.length ? (
-                        <FormControl className={classes.formControl}>
-                          <Select
-                            value={
-                              condition.operand.Label //default must be AND
-                            }
-                            onChange={e =>
-                              this.handleChange(
-                                condition,
-                                index,
-                                e.target.value,
-                                "operand"
-                              )
-                            }
-                            inputProps={{
-                              name: "operand",
-                              id: "operand-select"
-                            }}
-                            native
-                          >
-                            {Array.from(operandTypes.values()).map(operand => {
-                              return (
-                                <option
-                                  value={operand.Label}
-                                  key={operand.Label}
-                                >
-                                  {operand.Label}
-                                </option>
-                              );
-                            })}
-                          </Select>
-                        </FormControl>
-                      ) : null}
-                    </React.Fragment>
-                  ) : (
-                    <React.Fragment>
-                      <AdvancedFilter
-                        columns={columns}
-                        classes={classes}
-                        preLoadConditions={condition.conditions}
-                        onChange={newInnerConditions => {
-                          //on purpose doing it like this to avoid re render (?!)
-                          this.state.conditions[
-                            index
-                          ].conditions = newInnerConditions;
-                          this.validateAndCreate(this.state.conditions);
-                        }}
-                        isNested={true}
-                        header={"Nested Condition"}
-                      />
-                      {index + 1 < this.state.conditions.length ? (
-                        <FormControl className={classes.formControl}>
-                          <Select
-                            value={
-                              condition.operand.Label //default must be AND
-                            }
-                            onChange={e =>
-                              this.handleChange(
-                                condition,
-                                index,
-                                e.target.value,
-                                "operand"
-                              )
-                            }
-                            inputProps={{
-                              name: "operand",
-                              id: "operand-select"
-                            }}
-                            native
-                          >
-                            {Array.from(operandTypes.values()).map(operand => {
-                              return (
-                                <option
-                                  value={operand.Label}
-                                  key={operand.Label}
-                                >
-                                  {operand.Label}
-                                </option>
-                              );
-                            })}
-                          </Select>
-                        </FormControl>
-                      ) : null}
-                    </React.Fragment>
-                  )}
+                ? this.props.header
+                : "Create Filter"}
+            </Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <div className={classes.root}>
+              {this.state.conditions.map((condition, index) => {
+                return (
+                  <section key={index} className={classes.conditionSection}>
+                    {condition.type === "Simple" ? (
+                      <React.Fragment>
+                        <ConditionLine
+                          key={index}
+                          classes={classes}
+                          condition={condition}
+                          index={index}
+                          handleChange={this.handleChange}
+                          columns={columns}
+                        />
+                        {condition.operator &&
+                        index + 1 < this.state.conditions.length ? (
+                          <FormControl className={classes.formControl}>
+                            <Select
+                              value={
+                                condition.operand.Label //default must be AND
+                              }
+                              onChange={e =>
+                                this.handleChange(
+                                  condition,
+                                  index,
+                                  e.target.value,
+                                  "operand"
+                                )
+                              }
+                              inputProps={{
+                                name: "operand",
+                                id: "operand-select"
+                              }}
+                              native
+                            >
+                              {Array.from(operandTypes.values()).map(
+                                operand => {
+                                  return (
+                                    <option
+                                      value={operand.Label}
+                                      key={operand.Label}
+                                    >
+                                      {operand.Label}
+                                    </option>
+                                  );
+                                }
+                              )}
+                            </Select>
+                          </FormControl>
+                        ) : null}
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        <AdvancedFilter
+                          columns={columns}
+                          classes={classes}
+                          preLoadConditions={condition.conditions}
+                          onChange={newInnerConditions => {
+                            //on purpose doing it like this to avoid re render (?!)
+                            this.state.conditions[
+                              index
+                            ].conditions = newInnerConditions;
+                            this.validateAndCreate(this.state.conditions);
+                          }}
+                          isNested={true}
+                          header={"Nested Condition"}
+                        />
+                        {index + 1 < this.state.conditions.length ? (
+                          <FormControl className={classes.formControl}>
+                            <Select
+                              value={
+                                condition.operand.Label //default must be AND
+                              }
+                              onChange={e =>
+                                this.handleChange(
+                                  condition,
+                                  index,
+                                  e.target.value,
+                                  "operand"
+                                )
+                              }
+                              inputProps={{
+                                name: "operand",
+                                id: "operand-select"
+                              }}
+                              native
+                            >
+                              {Array.from(operandTypes.values()).map(
+                                operand => {
+                                  return (
+                                    <option
+                                      value={operand.Label}
+                                      key={operand.Label}
+                                    >
+                                      {operand.Label}
+                                    </option>
+                                  );
+                                }
+                              )}
+                            </Select>
+                          </FormControl>
+                        ) : null}
+                      </React.Fragment>
+                    )}
 
-                  <Button
-                    variant={"outlined"}
-                    aria-label="Remove"
-                    className={classes.button}
-                    onClick={() => {
-                      this.removeCondition(index);
-                    }}
-                  >
-                    {"-"}
-                  </Button>
-                </section>
-              );
-            })}
-          </div>
-        </ExpansionPanelDetails>
-        <Divider />
-        <ExpansionPanelActions>
-          <Button
-            variant={"outlined"}
-            aria-label="AddNested"
-            className={classes.button}
-            onClick={() => {
-              this.addNewNestedCondition();
-            }}
-          >
-            {"+()"}
-          </Button>
-          <Button
-            variant={"outlined"}
-            aria-label="Add"
-            className={classes.button}
-            onClick={() => {
-              this.addNewCondition();
-            }}
-          >
-            {"+"}
-          </Button>
-          {!this.props.isNested && (
+                    <Button
+                      variant={"outlined"}
+                      aria-label="Remove"
+                      className={classes.button}
+                      onClick={() => {
+                        this.removeCondition(index);
+                      }}
+                    >
+                      {"-"}
+                    </Button>
+                  </section>
+                );
+              })}
+            </div>
+          </ExpansionPanelDetails>
+          <Divider />
+          <ExpansionPanelActions>
             <Button
               variant={"outlined"}
-              onClick={() =>
-                this.props.getFilterStatement(this.state.filterStatement)
-              }
-              size="small"
-              color="primary"
+              aria-label="AddNested"
+              className={classes.button}
+              onClick={() => {
+                this.addNewNestedCondition();
+              }}
             >
-              Apply
+              {"+()"}
             </Button>
-          )}
-        </ExpansionPanelActions>
-      </ExpansionPanel>
+            <Button
+              variant={"outlined"}
+              aria-label="Add"
+              className={classes.button}
+              onClick={() => {
+                this.addNewCondition();
+              }}
+            >
+              {"+"}
+            </Button>
+            {!this.props.isNested && (
+              <Button
+                variant={"outlined"}
+                onClick={() =>
+                  this.props.getFilterStatement(this.state.filterStatement)
+                }
+                size="small"
+                color="primary"
+              >
+                Apply
+              </Button>
+            )}
+          </ExpansionPanelActions>
+        </ExpansionPanel>
+      </MuiPickersUtilsProvider>
     );
   }
 }
 
 AdvancedFilter.propTypes = {
-  columns: PropTypes.array.isRequired,
+  /** Array of Objects defining columns
+   * {header, accessor, dataType, isReadOnly, isHidden}*/
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      header: PropTypes.string.isRequired,
+      accessor: PropTypes.string.isRequired,
+      dataType: PropTypes.oneOf([
+        "String",
+        "Number",
+        "Date",
+        "DateTime",
+        "Time",
+        "Boolean"
+      ]),
+      isHidden: PropTypes.bool //if not available will be shown
+    })
+  ).isRequired,
+  /** Text instead of "Create Filter" being used for nested filters internally */
   header: PropTypes.string,
+  /** Clicking on Apply will call this function and return the created filter (Where clause) */
   getFilterStatement: PropTypes.func
 };
 
 AdvancedFilter.defaultProps = {
-  columns: [{ Header: "Sample", accessor: "sample", dataType: "String" }]
+  columns: [{ header: "Sample", accessor: "sample", dataType: "String" }]
 };
 
 export default withStyles(styles, { withTheme: true })(AdvancedFilter);

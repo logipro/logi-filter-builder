@@ -1,85 +1,71 @@
 import React from "react";
 import FormControl from "@material-ui/core/FormControl";
 import TextField from "@material-ui/core/TextField";
+import { TimePicker } from "material-ui-pickers";
+import { DatePicker } from "material-ui-pickers";
+import { DateTimePicker } from "material-ui-pickers";
+import Checkbox from "@material-ui/core/Checkbox";
+import ArrowForward from "@material-ui/icons/ArrowForward";
+import ArrowBack from "@material-ui/icons/ArrowBack";
+import { Value2SQLValue } from "./Value2SQLValue";
 
 function ValueInput(props) {
   var { classes, conditionColumn, conditionColumnIndex, handleChange } = props;
-
+  const onDateInputChange = date =>
+    props.handleChange(
+      conditionColumn,
+      conditionColumnIndex,
+      date,
+      "value",
+      Value2SQLValue.get(props.dataType)(date)
+    );
   switch (props.dataType) {
     case "Date":
       return (
         <FormControl className={classes.formControl}>
-          <TextField
-            id="standard-dense"
-            type={"date"}
-            className={classes.textField}
+          <DatePicker
             error={!(conditionColumn.value && conditionColumn.value.value)}
+            autoOk={true}
             value={
               conditionColumn.value && conditionColumn.value.value
                 ? conditionColumn.value.value
-                : ""
+                : new Date()
             }
-            onChange={e => {
-              var d = new Date(Date.parse(e.target.value));
-              var dateString =
-                `'` +
-                d.getFullYear() +
-                "-" +
-                ("0" + (d.getMonth() + 1)).slice(-2) +
-                "-" +
-                ("0" + d.getDate()).slice(-2) +
-                " " +
-                ("0" + d.getHours()).slice(-2) +
-                ":" +
-                ("0" + d.getMinutes()).slice(-2) +
-                `'`;
-              handleChange(
-                conditionColumn,
-                conditionColumnIndex,
-                e.target.value,
-                "value",
-                dateString
-              );
-            }}
+            onChange={onDateInputChange}
+            rightArrowIcon={<ArrowForward />}
+            leftArrowIcon={<ArrowBack />}
           />
         </FormControl>
       );
     case "DateTime":
-    case "DateTime2":
       return (
         <FormControl className={classes.formControl}>
-          <TextField
-            id="standard-dense"
-            type={"datetime-local"}
-            className={classes.textField}
+          <DateTimePicker
             error={!(conditionColumn.value && conditionColumn.value.value)}
+            autoOk={true}
             value={
               conditionColumn.value && conditionColumn.value.value
                 ? conditionColumn.value.value
-                : ""
+                : new Date()
             }
-            onChange={e => {
-              var d = new Date(Date.parse(e.target.value));
-              var dateString =
-                `'` +
-                d.getFullYear() +
-                "-" +
-                ("0" + (d.getMonth() + 1)).slice(-2) +
-                "-" +
-                ("0" + d.getDate()).slice(-2) +
-                " " +
-                ("0" + d.getHours()).slice(-2) +
-                ":" +
-                ("0" + d.getMinutes()).slice(-2) +
-                `'`;
-              handleChange(
-                conditionColumn,
-                conditionColumnIndex,
-                e.target.value,
-                "value",
-                dateString
-              );
-            }}
+            onChange={onDateInputChange}
+            rightArrowIcon={<ArrowForward />}
+            leftArrowIcon={<ArrowBack />}
+          />
+        </FormControl>
+      );
+    case "Time":
+      return (
+        <FormControl className={classes.formControl}>
+          <TimePicker
+            error={!(conditionColumn.value && conditionColumn.value.value)}
+            autoOk={true}
+            value={
+              conditionColumn.value && conditionColumn.value.value
+                ? conditionColumn.value.value
+                : new Date()
+            }
+            onChange={onDateInputChange}
           />
         </FormControl>
       );
@@ -98,9 +84,26 @@ function ValueInput(props) {
                 conditionColumnIndex,
                 e.target.value,
                 "value",
-                `'${e.target.value}'`
+                Value2SQLValue.get(props.dataType)(e.target.value)
               )
             }
+          />
+        </FormControl>
+      );
+    case "Boolean":
+      return (
+        <FormControl className={classes.formControl}>
+          <Checkbox
+            onChange={e =>
+              handleChange(
+                conditionColumn,
+                conditionColumnIndex,
+                e.target.checked,
+                "value",
+                Value2SQLValue.get(props.dataType)(e.target.checked)
+              )
+            }
+            checked={conditionColumn.value ? conditionColumn.value.value : ""}
           />
         </FormControl>
       );
@@ -118,7 +121,7 @@ function ValueInput(props) {
                 conditionColumnIndex,
                 e.target.value,
                 "value",
-                `'${e.target.value}'`
+                Value2SQLValue.get(props.dataType)(e.target.value)
               )
             }
           />

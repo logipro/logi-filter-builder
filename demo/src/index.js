@@ -6,31 +6,31 @@ import AdvancedFilter from "../../src";
 class Demo extends Component {
   render() {
     const columns = [
-      { Header: "String Column", accessor: "Task", dataType: "String" },
+      { header: "String Column", accessor: "Task", dataType: "String" },
       {
-        Header: "DateTime Column",
+        header: "DateTime Column",
         accessor: "CreatedDateTime",
         dataType: "DateTime"
       },
       {
-        Header: "Date Column",
+        header: "Date Column",
         accessor: "TaskBeginTime",
         dataType: "Date"
       },
-      { Header: "TaskEndTime", accessor: "TaskEndTime", dataType: "DateTime" },
+      { header: "TaskEndTime", accessor: "TaskEndTime", dataType: "DateTime" },
       {
-        Header: "Number Column",
+        header: "Number Column",
         accessor: "TaskID",
-        show: true,
+        isHidden: true,
         dataType: "Number"
       },
-      //{ Header: "TaskTypeID", accessor: "TaskTypeID" }
-      //{ Header: "Flag", accessor: "Flag" },
-      //{ Header: "JobName", accessor: "JobName" },
-      //{ Header: "Priority", accessor: "Priority" },
-      //{ Header: "StatusID", accessor: "StatusID" },
+      //{ header: "TaskTypeID", accessor: "TaskTypeID" }
+      //{ header: "Flag", accessor: "Flag" },
+      //{ header: "JobName", accessor: "JobName" },
+      //{ header: "Priority", accessor: "Priority" },
+      //{ header: "StatusID", accessor: "StatusID" },
       {
-        Header: "Status",
+        header: "Status",
         accessor: "Status",
         dataType: "String",
         Cell: row => (
@@ -41,10 +41,10 @@ class Demo extends Component {
                   row.value === "Waiting"
                     ? "#57d500"
                     : row.value === "Running"
-                      ? "#ffbf00"
-                      : row.value === "Failed"
-                        ? "#ff2e00"
-                        : "#ffbf00",
+                    ? "#ffbf00"
+                    : row.value === "Failed"
+                    ? "#ff2e00"
+                    : "#ffbf00",
                 transition: "all .3s ease"
               }}
             >
@@ -54,7 +54,8 @@ class Demo extends Component {
           </span>
         )
       },
-      { Header: "Task Type", accessor: "TaskType", dataType: "String" }
+      { header: "Task Type", accessor: "TaskType", dataType: "String" },
+      { header: "Boolean Sample", accessor: "BoolSample", dataType: "Boolean" }
     ];
 
     return (

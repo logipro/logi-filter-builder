@@ -10,11 +10,11 @@ function ConditionLine(props) {
     <React.Fragment>
       <FormControl className={classes.formControl}>
         <Select
-          error={!(condition.column && condition.column.Header)}
+          error={!(condition.column && condition.column.header)}
           native
           value={
-            condition.column && condition.column.Header
-              ? condition.column.Header
+            condition.column && condition.column.header
+              ? condition.column.header
               : "None"
           }
           onChange={e =>
@@ -29,10 +29,10 @@ function ConditionLine(props) {
             None
           </option>
           {columns
-            .filter(c => c.show === undefined || c.show === true)
+            .filter(c => c.isHidden === undefined || c.isHidden === true)
             .map(c => (
-              <option value={c.Header} key={c.accessor}>
-                {c.Header}
+              <option value={c.header} key={c.accessor}>
+                {c.header}
               </option>
             ))}
         </Select>

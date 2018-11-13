@@ -26,6 +26,10 @@ operatorTypes
     { Label: "Not Like", TranslateTo: " Not Like " },
     { Label: "=", TranslateTo: " = " },
     { Label: "!=", TranslateTo: " != " }
+  ])
+  .set("Boolean", [
+    { Label: "=", TranslateTo: " = " },
+    { Label: "!=", TranslateTo: " != " }
   ]);
 
 export const operandTypes = new Map();

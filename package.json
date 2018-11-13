@@ -23,14 +23,20 @@
   "peerDependencies": {
     "react": "16.x",
     "@material-ui/core": "3.3.x",
-    "@material-ui/icons": "3.x"
+    "@material-ui/icons": "3.x",
+    "material-ui-pickers": "^2.0.1",
+    "date-fns": "2.0.0-alpha.16",
+    "@date-io/date-fns": "0.x"
   },
   "devDependencies": {
+    "@date-io/date-fns": "0.x",
     "@material-ui/core": "3.3.x",
     "@material-ui/icons": "3.x",
+    "date-fns": "2.0.0-alpha.16",
+    "material-ui-pickers": "^2.0.1",
     "nwb": "0.23.x",
-    "react": "^16.6.0",
-    "react-dom": "^16.6.0"
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3"
   },
   "author": "LogiPro UK",
   "homepage": "LogiPro.co.uk",
