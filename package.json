@@ -1,6 +1,6 @@
 {
   "name": "logi-filter-builder",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Logi-filter-builder React component",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -18,7 +18,13 @@
     "docz:dev": "docz dev",
     "docz:build": "docz build"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@material-ui/core": "3.3.x",
+    "@material-ui/icons": "3.x",
+    "material-ui-pickers": "^2.0.1",
+    "date-fns": "2.0.0-alpha.16",
+    "@date-io/date-fns": "0.x"
+  },
   "peerDependencies": {
     "react": "16.x",
     "@material-ui/core": "3.3.x",
@@ -39,7 +45,7 @@
     "docz": "latest"
   },
   "author": "LogiPro UK",
-  "homepage": "LogiPro.co.uk",
+  "homepage": "https://logipro.github.io/logi-filter-builder/#/",
   "license": "MIT",
   "repository": "https://github.com/logipro/logi-filter-builder",
   "keywords": [
