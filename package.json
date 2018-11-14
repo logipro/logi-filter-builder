@@ -1,6 +1,6 @@
 {
   "name": "logi-filter-builder",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Logi-filter-builder React component",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -19,8 +19,6 @@
     "docz:build": "docz build"
   },
   "dependencies": {
-    "@material-ui/core": "3.3.x",
-    "@material-ui/icons": "3.x",
     "material-ui-pickers": "^2.0.1",
     "date-fns": "2.0.0-alpha.16",
     "@date-io/date-fns": "0.x"

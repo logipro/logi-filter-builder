@@ -45,7 +45,7 @@ const styles = theme => ({
   }
 });
 
-class AdvancedFilter extends Component {
+class LogiFilterBuilder extends Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
@@ -279,7 +279,7 @@ class AdvancedFilter extends Component {
                       </React.Fragment>
                     ) : (
                       <React.Fragment>
-                        <AdvancedFilter
+                        <LogiFilterBuilder
                           columns={columns}
                           classes={classes}
                           preLoadConditions={condition.conditions}
@@ -387,7 +387,7 @@ class AdvancedFilter extends Component {
   }
 }
 
-AdvancedFilter.propTypes = {
+LogiFilterBuilder.propTypes = {
   /** Array of Objects defining columns
    * {header, accessor, dataType, isReadOnly, isHidden}*/
   columns: PropTypes.arrayOf(
@@ -413,11 +413,11 @@ AdvancedFilter.propTypes = {
   startExpanded: PropTypes.bool
 };
 
-AdvancedFilter.defaultProps = {
+LogiFilterBuilder.defaultProps = {
   startExpanded: false
 };
 
 //exporting like this so Docz will pick the props!
-export default (AdvancedFilter = withStyles(styles, { withTheme: true })(
-  AdvancedFilter
+export default (LogiFilterBuilder = withStyles(styles, { withTheme: true })(
+  LogiFilterBuilder
 ));

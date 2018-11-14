@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import AdvancedFilter from "../../src";
+import LogiFilterBuilder from "../../src";
 
 class Demo extends Component {
   render() {
@@ -60,7 +60,7 @@ class Demo extends Component {
     return (
       <div>
         <h1>Logi-filter-builder Demo</h1>
-        <AdvancedFilter
+        <LogiFilterBuilder
           startExpanded={true}
           columns={columns}
           getFilterStatement={filterStatement => {
