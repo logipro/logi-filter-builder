@@ -51,12 +51,14 @@ class LogiFilterBuilder extends Component {
     this.handleChange = this.handleChange.bind(this);
     if (props.preLoadConditions) {
       this.state = {
+        Error: false,
         conditions: props.preLoadConditions
       };
     } else {
       this.state = {
         conditions: [
           {
+            Error: false,
             type: "Simple",
             column: undefined,
             operator: undefined,
@@ -370,6 +372,7 @@ class LogiFilterBuilder extends Component {
             </Button>
             {!this.props.isNested && (
               <Button
+                disabled={this.state.Error}
                 variant={"outlined"}
                 onClick={() =>
                   this.props.getFilterStatement(this.state.filterStatement)
