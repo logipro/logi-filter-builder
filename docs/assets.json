@@ -1,7 +1,7 @@
 {
   "vendors.js": "./static/js/vendors.a08830e1.js",
-  "app.js": "./static/js/app.d4b9ef69.js",
-  "docz-advanced-filter.js": "./static/js/docz-advanced-filter.2ae10899.js",
-  "runtime~app.js": "./static/js/runtime~app.8fb30a36c4cebcd85d02.js",
+  "app.js": "./static/js/app.e27c6658.js",
+  "docz-advanced-filter.js": "./static/js/docz-advanced-filter.f92cd5bd.js",
+  "runtime~app.js": "./static/js/runtime~app.fe8a1c86a07422f4e9b3.js",
   "index.html": "./index.html"
 }
